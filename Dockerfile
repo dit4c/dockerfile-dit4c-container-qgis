@@ -90,3 +90,20 @@ RUN cd /opt && \
   make -j$(nproc)
 
 RUN echo "/usr/lib64/libpng.so" > /etc/ld.so.preload
+
+RUN ln -s /opt/QGIS*/build/output /opt/qgis && \
+  ln -s /opt/qgis/bin/qgis /usr/bin/qgis && \
+  ln -s /opt/qgis/bin/qbrowser /usr/bin/qbrowser && \
+  cd /opt/QGIS* && \
+  QGISDIR=$(pwd) && \
+  install -o root -g root -m 644 ${QGISDIR}/debian/qgis.desktop /usr/share/applications/qgis.desktop && \
+  install -o root -g root -m 644 ${QGISDIR}/debian/qbrowser.desktop /usr/share/applications/qbrowser.desktop && \
+  # Install application icon
+  for size in 16x16 22x22 24x24 32x32 36x36 48x48 64x64 72x72 96x96 128x128 192x192 256x256; do \
+    install -o root -g root -m 644 ${QGISDIR}/debian/qgis-icon${size}.png /usr/share/icons/hicolor/${size}/apps/qgis.png ; \
+    install -o root -g root -m 644 ${QGISDIR}/debian/qbrowser-icon${size}.png /usr/share/icons/hicolor/${size}/apps/qbrowser.png ; \
+  done && \
+  LNUM=$(sed -n '/launcher_item_app/=' /etc/tint2/panel.tint2rc | head -1) && \
+  sed -i "${LNUM}ilauncher_item_app = /usr/share/applications/qbrowser.desktop" /etc/tint2/panel.tint2rc && \
+  sed -i "${LNUM}ilauncher_item_app = /usr/share/applications/qgis.desktop" /etc/tint2/panel.tint2rc && \
+  rm /usr/share/applications/qt4-*.desktop
