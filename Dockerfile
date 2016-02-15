@@ -1,4 +1,4 @@
-FROM dit4c/dit4c-container-x11
+FROM dit4c/dit4c-container-x11:xpra
 MAINTAINER Tim Dettrick <t.dettrick@uq.edu.au>
 
 RUN yum install -y \
