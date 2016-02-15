@@ -107,3 +107,10 @@ RUN ln -s /opt/QGIS*/build/output /opt/qgis && \
   sed -i "${LNUM}ilauncher_item_app = /usr/share/applications/qbrowser.desktop" /etc/tint2/panel.tint2rc && \
   sed -i "${LNUM}ilauncher_item_app = /usr/share/applications/qgis.desktop" /etc/tint2/panel.tint2rc && \
   rm /usr/share/applications/qt4-*.desktop
+
+RUN pip install ipython jupyter
+
+COPY etc /etc
+COPY var /var
+
+RUN su - researcher -c "mkdir -p ~/.jupyter && echo \"c.NotebookApp.base_url = '/jupyter'\" > ~/.jupyter/jupyter_notebook_config.py"
