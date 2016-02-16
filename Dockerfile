@@ -68,6 +68,9 @@ RUN cd /tmp && \
   curl -s -L "https://grass.osgeo.org/grass70/source/grass-7.0.2.tar.gz" | tar xzv && \
   cd grass* && \
   ./configure \
+    --prefix=/opt \
+    --enable-64bit \
+    --with-libs=/usr/lib64 \
     --with-blas \
     --with-gdal=/usr/local/bin/gdal-config \
     --with-proj \
@@ -79,19 +82,18 @@ RUN cd /tmp && \
     --with-sqlite \
     --with-freetype-includes=/usr/include/freetype2 && \
   LD_LIBRARY_PATH=/usr/local/lib make && make install && \
+  ln -s /opt/grass* /opt/grass && \
   rm -r grass*
+
+RUN echo "/usr/lib64/libpng.so" > /etc/ld.so.preload
 
 RUN cd /opt && \
   curl -s -L "https://github.com/qgis/QGIS/archive/final-2_12_3.tar.gz" | tar xzv && \
   cd QGIS* && \
   mkdir build && \
   cd build && \
-  cmake -D WITH_INTERNAL_QWTPOLAR=false .. && \
-  make -j$(nproc)
-
-RUN echo "/usr/lib64/libpng.so" > /etc/ld.so.preload
-
-RUN ln -s /opt/QGIS*/build/output /opt/qgis && \
+  cmake -DGRASS_PREFIX=/opt/grass -DCMAKE_INSTALL_PREFIX=/opt/qgis -DWITH_INTERNAL_QWTPOLAR=false .. && \
+  make -j$(nproc) all install && \
   ln -s /opt/qgis/bin/qgis /usr/bin/qgis && \
   ln -s /opt/qgis/bin/qbrowser /usr/bin/qbrowser && \
   cd /opt/QGIS* && \
@@ -103,7 +105,10 @@ RUN ln -s /opt/QGIS*/build/output /opt/qgis && \
     install -o root -g root -m 644 ${QGISDIR}/debian/qgis-icon${size}.png /usr/share/icons/hicolor/${size}/apps/qgis.png ; \
     install -o root -g root -m 644 ${QGISDIR}/debian/qbrowser-icon${size}.png /usr/share/icons/hicolor/${size}/apps/qbrowser.png ; \
   done && \
-  LNUM=$(sed -n '/launcher_item_app/=' /etc/tint2/panel.tint2rc | head -1) && \
+  cd /opt && \
+  rm -rf $QGISDIR
+
+RUN LNUM=$(sed -n '/launcher_item_app/=' /etc/tint2/panel.tint2rc | head -1) && \
   sed -i "${LNUM}ilauncher_item_app = /usr/share/applications/qbrowser.desktop" /etc/tint2/panel.tint2rc && \
   sed -i "${LNUM}ilauncher_item_app = /usr/share/applications/qgis.desktop" /etc/tint2/panel.tint2rc && \
   rm /usr/share/applications/qt4-*.desktop
@@ -113,4 +118,6 @@ RUN pip install ipython jupyter
 COPY etc /etc
 COPY var /var
 
+# Update dynamic library paths using /etc/ld.so.conf.d
+RUN ldconfig
 RUN su - researcher -c "mkdir -p ~/.jupyter && echo \"c.NotebookApp.base_url = '/jupyter'\" > ~/.jupyter/jupyter_notebook_config.py"
