@@ -1,1 +1,1 @@
-export PYTHONPATH=/opt/qgis/python
+export PYTHONPATH=/opt/qgis/share/qgis/python
