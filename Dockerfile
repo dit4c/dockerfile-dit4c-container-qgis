@@ -5,7 +5,7 @@ RUN yum install -y \
   gcc gcc-c++ \
   cmake flex bison \
   libspatialite-devel spatialindex-devel \
-  qtwebkit-devel qca2-devel qca-ossl qwtpolar-devel \
+  qtwebkit-devel qca2-devel qca2-ossl qwtpolar-devel \
   qt-devel \
   proj-devel \
   sqlite-devel \
@@ -36,7 +36,7 @@ RUN cd /tmp && PYQT_VERSION=4.11.4 && \
   rm -rf PyQt-x11-gpl-$PYQT_VERSION
 
 RUN cd /tmp && QSCINTILLA_VERSION=2.9.1 && \
-  curl -s -L "http://sourceforge.net/projects/pyqt/files/QScintilla2/QScintilla-2.9.1/QScintilla-gpl-$QSCINTILLA_VERSION.tar.gz" | tar xzv && \
+  curl -s -L "http://sourceforge.net/projects/pyqt/files/QScintilla2/QScintilla-$QSCINTILLA_VERSION/QScintilla-gpl-$QSCINTILLA_VERSION.tar.gz" | tar xzv && \
   cd QScintilla-gpl-$QSCINTILLA_VERSION && \
   cd Qt4Qt5 &&\
   /usr/lib64/qt4/bin/qmake qscintilla.pro && \
@@ -88,7 +88,7 @@ RUN cd /tmp && \
 RUN echo "/usr/lib64/libpng.so" > /etc/ld.so.preload
 
 RUN cd /opt && \
-  curl -s -L "https://github.com/qgis/QGIS/archive/final-2_12_3.tar.gz" | tar xzv && \
+  curl -s -L "https://github.com/qgis/QGIS/archive/final-2_14_0.tar.gz" | tar xzv && \
   cd QGIS* && \
   mkdir build && \
   cd build && \
@@ -107,6 +107,8 @@ RUN cd /opt && \
   done && \
   cd /opt && \
   rm -rf $QGISDIR
+
+RUN CFLAGS=-I/usr/include pip install pyspatialite
 
 RUN LNUM=$(sed -n '/launcher_item_app/=' /etc/tint2/panel.tint2rc | head -1) && \
   sed -i "${LNUM}ilauncher_item_app = /usr/share/applications/qbrowser.desktop" /etc/tint2/panel.tint2rc && \
