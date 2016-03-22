@@ -1,4 +1,4 @@
-FROM dit4c/dit4c-container-x11:debian
+FROM dit4c/dit4c-container-x11:debian-xpra
 MAINTAINER Tim Dettrick <t.dettrick@uq.edu.au>
 
 RUN echo "deb http://qgis.org/debian/ jessie main" >> /etc/apt/sources.list && \
