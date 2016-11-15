@@ -14,7 +14,7 @@ RUN echo "deb http://qgis.org/debian/ jessie main" >> /etc/apt/sources.list && \
     qgis python-pip python-all-dev gdebi-core r-base r-base-dev \
     libcurl4-gnutls-dev libxml2-dev libssl-dev pkg-config libgdal-dev \
     libproj-dev libssh2-1-dev && \
-  export PKG=rstudio-server-1.0.44-amd64.deb && \
+  export PKG=rstudio-server-0.99.893-amd64.deb && \
   cd /tmp && \
   curl -LOs https://download2.rstudio.org/$PKG && \
   gdebi --non-interactive $PKG && \
